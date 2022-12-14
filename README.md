@@ -22,14 +22,14 @@ This provides a docker image that can simplify the process.
 
 #### Using a local copy of the repository
 
-    ARGS="dev -e reverse-proxy -l" make run
+    ARGS="scale dev -e reverse-proxy -l" make run
 
 #### Without make
 
-    docker run -it -v $(HOME)/.aws:/root/.aws:ro dev -e reverse-proxy -l
+    docker run -it -v $(HOME)/.aws:/root/.aws:ro scale dev -e reverse-proxy -l
 
 _note: You are not required to mount credentials, but the program will expect to be allowed to make api calls._
 
 #### Directly from docker hub.
 
-    docker run -it -v $(HOME)/.aws:/root/.aws:ro theherk/ecs-scaler dev -e reverse-proxy -l
+    docker run -it -v $(HOME)/.aws:/root/.aws:ro theherk/ecs-scaler scale dev -e reverse-proxy -l
