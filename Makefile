@@ -5,6 +5,7 @@ IMAGE := ecs-scaler
 IMAGES := $(shell docker images | awk '/$(IMAGE)/ {print $$3}')
 RUNNING :=  $(shell docker ps | grep "$(IMAGE)" | awk '{print $$1}')
 ALL := $(shell docker ps -a | grep "$(IMAGE)" | awk '{print $$1}')
+TAG := $(shell git describe --tags --abbrev=0)
 
 help: ## display this usage message
 	$(info available targets:)
@@ -35,6 +36,8 @@ publish: build ## publish the docker build to registry
 	docker login -u theherk
 	docker tag $(IMAGE):latest theherk/$(IMAGE):latest
 	docker push theherk/$(IMAGE):latest
+	docker tag $(IMAGE):latest theherk/$(IMAGE):$(TAG)
+	docker push theherk/$(IMAGE):$(TAG)
 
 run: clean-containers build ## remove previous and run a new container
 	docker run -it \

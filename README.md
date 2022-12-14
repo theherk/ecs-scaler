@@ -6,15 +6,15 @@ A small, opinionated tool used to scale in and out ECS services. This will match
 
 ## Usage
 
-    ./svcmgr.py [env] [options]
+    ./scale.py [env] [options]
 
 #### Example (scale all services in dev to min 2 max 4 except services matching reverse-proxy):
 
-    ./svcmgr.py dev -e reverse-proxy --min 2 --max 4
+    ./scale.py dev -e reverse-proxy --min 2 --max 4
 
 #### Example (list all services that match excluding reverse-proxy):
 
-    ./svcmgr.py dev -e reverse-proxy -l
+    ./scale.py dev -e reverse-proxy -l
 
 ### Usage with docker
 
