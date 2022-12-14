@@ -31,7 +31,7 @@ clean-containers: stop-all ## remove containers
 	for c in $(ALL); do docker rm $$c; done
 
 clean-images: clean-containers ## remove images
-	for c in $(IMAGES); do docker rmi $$c; done
+	for c in $(IMAGES); do docker rmi -f $$c; done
 
 publish: build ## publish the docker build to registry
 	docker login -u theherk
