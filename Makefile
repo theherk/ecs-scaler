@@ -22,8 +22,12 @@ requirements.txt: ## generate requirements file
 	pipenv requirements > $@
 
 build: requirements.txt ## build the image
-	docker buildx build --platform linux/arm64/v8,linux/amd64 -t theherk/ecs-scaler:latest .
-	docker buildx build --platform linux/arm64/v8,linux/amd64 -t theherk/ecs-scaler:$(TAG) .
+	docker buildx build --platform linux/amd64 -t theherk/ecs-scaler:latest .
+	docker buildx build --platform linux/amd64 -t theherk/ecs-scaler:$(TAG) .
+	docker buildx build --platform linux/amd64 -t theherk/ecs-scaler:latest-amd64 .
+	docker buildx build --platform linux/amd64 -t theherk/ecs-scaler:$(TAG)-amd64 .
+	docker buildx build --platform linux/arm64/v8 -t theherk/ecs-scaler:latest-arm64 .
+	docker buildx build --platform linux/arm64/v8 -t theherk/ecs-scaler:$(TAG)-arm64 .
 
 clean: clean-images ## clean all the things
 
@@ -37,6 +41,10 @@ publish: build ## publish the docker build to registry
 	docker login -u theherk
 	docker push theherk/$(IMAGE):latest
 	docker push theherk/$(IMAGE):$(TAG)
+	docker push theherk/$(IMAGE):latest-amd64
+	docker push theherk/$(IMAGE):$(TAG)-amd64
+	docker push theherk/$(IMAGE):latest-arm64
+	docker push theherk/$(IMAGE):$(TAG)-arm64
 
 run: clean-containers build ## remove previous and run a new container
 	docker run -it \
