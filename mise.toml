@@ -1,0 +1,42 @@
+[tools]
+python = "3"
+
+[tasks.build]
+description = "Build multi-arch Docker images locally"
+run = """
+TAG=$(git describe --tags --abbrev=0)
+docker buildx build --platform linux/amd64 -t theherk/ecs-scaler:${TAG}-amd64 --load .
+docker buildx build --platform linux/arm64/v8 -t theherk/ecs-scaler:${TAG}-arm64 --load .
+"""
+
+[tasks.publish]
+description = "Build and publish multi-arch Docker image to GHCR"
+run = """
+TAG=$(git describe --tags --abbrev=0)
+docker buildx build --platform linux/amd64,linux/arm64 \
+  -t ghcr.io/theherk/ecs-scaler:latest \
+  -t ghcr.io/theherk/ecs-scaler:${TAG} \
+  --push .
+"""
+
+[tasks.run]
+description = "Run the scaler locally"
+run = "uv run scale {{arg(name='args', rest=true)}}"
+
+[tasks.attach]
+description = "Attach to a running container interactively"
+depends = ["build"]
+run = """
+docker run -it \
+  --name ecs-scaler-1 \
+  --entrypoint /bin/bash \
+  -v ${HOME}/.aws:/root/.aws:ro \
+  theherk/ecs-scaler:$(git describe --tags --abbrev=0)-$(uname -m | sed 's/x86_64/amd64/' | sed 's/aarch64/arm64/')
+"""
+
+[tasks.clean]
+description = "Remove all containers and images for this project"
+run = """
+for c in $(docker ps -a | grep ecs-scaler | awk '{print $1}'); do docker stop $c; docker rm $c; done
+for i in $(docker images | awk '/ecs-scaler/ {print $3}'); do docker rmi -f $i; done
+"""

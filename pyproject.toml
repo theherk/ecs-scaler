@@ -1,0 +1,15 @@
+[project]
+name = "ecs-scaler"
+version = "1.2.0"
+description = "Scale ECS services by environment, with include/exclude filtering"
+requires-python = ">=3.12"
+license = "MIT"
+authors = [{ name = "Adam Sherwood", email = "theherk@gmail.com" }]
+dependencies = ["boto3"]
+
+[project.scripts]
+scale = "scale:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

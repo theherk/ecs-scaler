@@ -1,7 +1,7 @@
-FROM python:3
-    MAINTAINER Adam Sherwood <theherk@gmail.com>
+FROM python:3-slim
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
 
-COPY requirements.txt requirements.txt
-RUN pip install --no-cache-dir -r requirements.txt
-COPY . .
-RUN ln -s /scale.py /bin/scale
+WORKDIR /app
+COPY pyproject.toml uv.lock ./
+COPY scale.py .
+RUN uv sync --frozen --no-dev && ln -s /app/.venv/bin/scale /usr/local/bin/scale

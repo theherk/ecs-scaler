@@ -1,35 +1,66 @@
 # ecs-scaler
 
-https://hub.docker.com/r/theherk/ecs-scaler/
+Scale ECS services by environment, with include/exclude filtering.
 
-A small, opinionated tool used to scale in and out ECS services. This will match all clusters with "-ENV" or "ENV-" in the name, retrieve all services running in those clusters, then scale them to min / max given. You can filter out results using `-e svcA -e svcB` or `--exclude svcA --exclude svcB`. Or to start with no matches and include specifically, `-i svcC -i svcD` or `--include svcC --include svcD`.
+Available from [GHCR](https://github.com/theherk/ecs-scaler/pkgs/container/ecs-scaler). Multi-arch images are published for `linux/amd64` and `linux/arm64`.
+
+## How it works
+
+Matches all ECS clusters with `-ENV` or `ENV-` in the name, retrieves all services in those clusters, then scales them to the given min/max. Filter results with `-i` (include) or `-e` (exclude).
 
 ## Usage
 
-    ./scale.py [env] [options]
+```
+scale [env] [options]
+```
 
-#### Example (scale all services in dev to min 2 max 4 except services matching reverse-proxy):
+### Examples
 
-    ./scale.py dev -e reverse-proxy --min 2 --max 4
+Scale all services in dev to min 2 / max 4, excluding reverse-proxy:
 
-#### Example (list all services that match excluding reverse-proxy):
+```
+scale dev -e reverse-proxy --min 2 --max 4
+```
 
-    ./scale.py dev -e reverse-proxy -l
+List matched services without scaling:
 
-### Usage with docker
+```
+scale dev -e reverse-proxy -l
+```
 
-This provides a docker image that can simplify the process.
+### Docker
 
-#### Using a local copy of the repository
+```
+docker run --rm \
+  -e AWS_ACCESS_KEY_ID \
+  -e AWS_SECRET_ACCESS_KEY \
+  -e AWS_SESSION_TOKEN \
+  -e AWS_DEFAULT_REGION=eu-north-1 \
+  ghcr.io/theherk/ecs-scaler:1.2.0 \
+  scale dev -e reverse-proxy --min 2 --max 4
+```
 
-    ARGS="scale dev -e reverse-proxy -l" make run
+Or mount credentials:
 
-#### Without make
+```
+docker run --rm -v ~/.aws:/root/.aws:ro ghcr.io/theherk/ecs-scaler:1.2.0 scale dev -l
+```
 
-    docker run -it -v $(HOME)/.aws:/root/.aws:ro scale dev -e reverse-proxy -l
+## Development
 
-_note: You are not required to mount credentials, but the program will expect to be allowed to make api calls._
+Requires [mise](https://mise.jdx.dev/) and [uv](https://docs.astral.sh/uv/).
 
-#### Directly from docker hub.
+```
+mise run build      # Build multi-arch images locally
+mise run publish    # Build and push to Docker Hub
+mise run run -- dev -l  # Run locally via uv
+```
 
-    docker run -it -v $(HOME)/.aws:/root/.aws:ro theherk/ecs-scaler scale dev -e reverse-proxy -l
+## Publishing
+
+Push a git tag to trigger the GitHub Actions workflow, which builds and publishes multi-arch images to GHCR:
+
+```
+git tag 1.2.0
+git push origin 1.2.0
+```
